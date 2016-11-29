@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<!--displays all of the clubs from the database in a nice little table LEJ-->
+<html>
+	<head>
+		<script src="http://www.parsecdn.com/js/parse-1.6.2.min.js"></script>
+		<script type="text/javascript">Parse.initialize("1nbCZcm4WHUpYs0C89oTo231mhcpL2LRa5KfsYtw", "nNWuXfGI2ujbWBzxd5Om3F3OgFIIZRfvonOxfdEc");</script>
+		<link rel="stylesheet" type="text/css" href="css/club.css">
+		<title>Clubs</title>
+	</head>
+	
+	<body style="background-color:#0072ff">
+		<!-- button to return to home and table to store clubs -->
+		<div style = "text-align: left; background-color:#696969; ">
+   			<input type="button" style="width:60px;height:40px;" onclick="toHome()" value="Back">
+   		</div>
+		
+		<table id='clubTable' class="clubs" border="1"><th>Club</th><th>Advisor</th><th>Location</th><th>Week</th></table>
+		
+		<script type = "text/javascript">
+			//Store the database stuff
+			var ClubObjects = [];
+
+			//Connect to database class
+			var Clubs = Parse.Object.extend("Clubs");
+			var query = new Parse.Query(Clubs);
+			
+			//Allows up to 1000 objects to be received from the database, up from the default 100
+			query.limit(1000);
+			//Returns all objects in an array
+			query.find({
+				success: function(results) {
+					lengthOfResults = results.length;
+					for(var i = 0; i < results.length; i++) {
+						//Transfer results to earlier array
+						ClubObjects.push(results[i]);
+					}
+					makeTable();
+				},
+				error: function(error) {
+					alert(error);
+				}
+			});
+			
+			function makeTable()
+			{
+				//gets table made above and makes 2d array to store rows of table
+				var table = document.getElementById('clubTable');
+			
+				//put all of the info into the rows
+				for(var i = 0; i < ClubObjects.length; i++)
+				{
+					var temp = document.createElement("tr");
+					var cell1 = document.createElement("td");
+					var cell2 = document.createElement("td");
+					var cell3 = document.createElement("td");
+					var cell4 = document.createElement("td");
+					cell1.innerHTML = ClubObjects[i].get("name").toString();
+					cell2.innerHTML = ClubObjects[i].get("advisor").toString();
+					cell3.innerHTML = ClubObjects[i].get("location").toString();
+					cell4.innerHTML = ClubObjects[i].get("week").toString();
+					temp.appendChild(cell1);
+					temp.appendChild(cell2);
+					temp.appendChild(cell3);
+					temp.appendChild(cell4);
+					
+					//make clubs for different weeks different colors
+					switch(cell4.innerHTML)
+					{
+						case "One":
+							temp.setAttribute("class", "one");
+							break;
+						case "Two":
+							temp.setAttribute("class", "two");
+							break;
+						case "Three":
+							temp.setAttribute("class", "three");
+							break;
+						case "Four":
+							temp.setAttribute("class", "four");
+							break;
+						default:
+							temp.setAttribute("class", "other");
+					}
+					table.appendChild(temp);
+				}
+				table.width = screen.width;
+			}
+						
+			function toHome()
+			{
+				window.location = "home.html";
+			}
+		</script>
+		
+	</body>
+</html>

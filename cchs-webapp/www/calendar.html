@@ -1,0 +1,150 @@
+<!DOCTYPE HTML>
+<!--Lauren Johnston displays lunch menu for current month LEJ-->
+<html>
+	<head>
+		<title>Calendar</title>
+		<link rel="stylesheet" type="text/css" href="css/calendar.css">
+		<script src="http://www.parsecdn.com/js/parse-1.6.2.min.js"></script>
+		<script type="text/javascript">Parse.initialize("1nbCZcm4WHUpYs0C89oTo231mhcpL2LRa5KfsYtw", "nNWuXfGI2ujbWBzxd5Om3F3OgFIIZRfvonOxfdEc");</script>
+	</head>
+	
+	<body bgcolor="#0072ff">
+		
+		<div style = "text-align: left; background-color:#696969; ">
+   			<input type="button" style="width:60px;height:40px;" onclick="toHome()" value="Back">
+   		</div>
+		
+		<table id="calendar" width="100%" border="1px solid">
+			<tr>
+				<td>Sunday</td>
+				<td>Monday</td>
+				<td>Tuesday</td>
+				<td>Wednesday</td>
+				<td>Thursday</td>
+				<td>Friday</td>
+				<td>Saturday</td>
+			</tr>
+		</table>
+		
+		<script type="text/javascript">
+			//get table from html
+			var table = document.getElementById("calendar");
+		
+			//Store the database stuff
+			var objects = [];
+
+			//Connect to database class
+			var events = Parse.Object.extend("Calendar");
+			var query = new Parse.Query(events);
+			
+			//Allows up to 1000 objects to be received from the database, up from the default 100
+			query.limit(1000);
+			//Returns all objects in an array
+			query.find({
+				success: function(results) 
+				{
+					lengthOfResults = results.length;
+					for(var i = 0; i < results.length; i++) 
+					{
+						//Transfer results to earlier array
+						objects.push(results[i]);
+					}
+					bubbleSort();
+					populate();
+				},
+				error: function(error) 
+				{
+					alert(error);
+				}
+			});
+			
+			function populate()
+			{
+				var count = 0;
+				var row = document.createElement("tr");
+				switch(objects[0].get("name")) {
+					case "Monday":
+						count = 1;
+						break;
+					case "Tuesday":
+						count = 2;
+						break;
+					case "Wednesday":
+						count = 3;
+						break;
+					case "Thursday":
+						count = 4;
+						break;
+					case "Friday":
+						count = 5;
+						break;
+					case "Saturday":
+						count = 6;
+						break;
+					default:
+						break;
+				}
+				for(i = 0; i < count; i++) {
+					var cell = document.createElement("td");
+					cell.setAttribute("class", "noPad");
+					row.appendChild(cell);
+				}
+				for(var i = 0; i < objects.length; i++)
+				{
+					//reset vars
+					if(count == 7)
+					{
+						count = 0;
+						table.appendChild(row);
+						row = document.createElement("tr");
+					}
+					
+					//create new cell to put info in and gets the content
+					var cell = document.createElement("td");
+					cell.setAttribute("class", "noPad");
+					var content = objects[i].get("cell");
+					
+					var para = document.createElement("p");
+					para.setAttribute("class", "noPad");
+					para.innerHTML = objects[i].get("date");
+					cell.appendChild(para);
+					
+					//formats the cell so that new lines actually happen
+					for(var j = 0; j < content.split("\n").length; j++)
+					{
+						//cause I don't want to type this a million times
+						var current = content.split("\n")[j];
+						current = current.replace(/([a-z])([A-Z])/g, '$1 $2');
+						var line = current;
+						var para = document.createElement("p");
+						para.setAttribute("class", "noPad");
+						para.innerHTML = line;
+						cell.appendChild(para);
+					}
+					
+					//adds cell to row and increments to keep track of weeks
+					row.appendChild(cell);
+					count++;
+				}
+				table.appendChild(row);
+			}
+			
+			function bubbleSort() {
+				var temp = [];
+				for(i = 0; i < objects.length; i++) {
+					for(j = 0; j < objects.length; j++) {
+						if(parseInt(objects[j].get("date")) == i + 1) {
+							temp.push(objects[j]);
+						}
+					}
+				}
+				objects = temp;
+			}
+			
+			function toHome()
+			{
+				window.location = "home.html";
+			}
+		</script>
+	</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<!--Lauren Johnston
+	displays articles scraped with schoolNews.py-->
+<html>
+	<head>
+		<script src="http://www.parsecdn.com/js/parse-1.4.2.min.js"></script>
+		<script type="text/javascript">Parse.initialize("1nbCZcm4WHUpYs0C89oTo231mhcpL2LRa5KfsYtw", "nNWuXfGI2ujbWBzxd5Om3F3OgFIIZRfvonOxfdEc");</script>
+		<link rel="stylesheet" type="text/css" href="css/schoolNews.css" />
+		<title>School News Page</title>
+	</head>
+	
+	<body bgcolor="#0072ff">
+		<div style = "text-align: left; background-color:#696969; ">
+   			<input type="button" style="width:60px;height:40px;" onclick="toHome()" value="Back">
+   		</div>
+		
+		<table id="stories"><th class="list">Stories</th></table>
+		
+		<script type="text/javascript">
+			//Store the database stuff
+			var newsObjects = [];
+
+			//Connect to database class
+			var news = Parse.Object.extend("News");
+			var query = new Parse.Query(news);
+			
+			//Allows up to 1000 objects to be received from the database, up from the default 100
+			query.limit(1000);
+			//Returns all objects in an array
+			query.find({
+				success: function(results) {
+					lengthOfResults = results.length;
+					for(var i = 0; i < results.length; i++) {
+						//Transfer results to earlier array
+						newsObjects.push(results[i]);
+					}
+					makeTable();
+				},
+				error: function(error) {
+					alert(error);
+				}
+			});
+		
+			function makeTable()
+			{
+				//gets table made above and makes 2d array to store rows of table
+				var table = document.getElementById('stories');
+				
+				//put all of the info into the rows
+				for(var i = 0; i < newsObjects.length; i++)
+				{
+					var temp = document.createElement("tr");
+					var button = document.createElement("input");
+					button.setAttribute("value", newsObjects[i].get("story").split("\n")[2]);
+					button.setAttribute("type", "button");
+					button.setAttribute("class", "center");
+					button.setAttribute("id", i.toString());
+					button.setAttribute("onclick", "showMore(this.value, parseInt(this.id))");
+					temp.appendChild(button);
+					table.appendChild(temp);
+				}
+			}
+			
+			function showMore(headline, id)
+			{
+				//sets local storage to the items needed in event.html and switches the window
+    			window.localStorage.setItem("event", newsObjects[id].get("story"));
+   				window.location = "story.html";
+			}
+			
+			function toHome()
+   			{
+   				window.location = "news.html";
+   			}
+   		</script>
+	</body>
+</html>
